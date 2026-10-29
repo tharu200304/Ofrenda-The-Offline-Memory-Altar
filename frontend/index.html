@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ofrenda: The Offline Memory Altar | Día de los Muertos</title>
+  <meta name="description" content="A local-first conversational remembrance companion for Día de los Muertos, powered by open-source AI and offline RAG to preserve private family stories forever.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="candle-lit" id="app-body">
+  <!-- Interactive Marigold Petals Canvas -->
+  <canvas id="petals-canvas" aria-hidden="true"></canvas>
+
+  <div class="ambient-glow" id="ambient-glow"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="skull-badge" title="Calavera de Azúcar">💀</div>
+      <div>
+        <h1 class="brand-title">OFRENDA</h1>
+        <p class="brand-tagline">The Offline Memory Altar • Día de los Muertos</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Connection / Offline Badge -->
+      <div class="status-pill" id="status-pill" title="Hardware status & privacy verification">
+        <span class="pulse-dot"></span>
+        <span id="status-text">100% Local &amp; Offline</span>
+      </div>
+
+      <!-- Vigil Candle Toggle Button -->
+      <button id="btn-toggle-candle" class="btn-candle" aria-label="Toggle altar candle light" title="Toggle Altar Candle">
+        <span class="candle-flame-icon">🔥</span>
+        <span id="candle-btn-label">Vigil Lit</span>
+      </button>
+
+      <!-- Open Archives Button -->
+      <button id="btn-open-archives" class="btn-nav" aria-label="Open family memory archives">
+        <span class="nav-icon">📜</span>
+        <span>Archives (<span id="archives-count">3</span>)</span>
+      </button>
+
+      <!-- Challenge Essay Button -->
+      <button id="btn-open-essay" class="btn-nav btn-accent" aria-label="Open open innovation challenge post">
+        <span class="nav-icon">✨</span>
+        <span>Open Innovation Post</span>
+      </button>
+
+      <!-- Settings Button -->
+      <button id="btn-open-settings" class="btn-icon" aria-label="System Settings" title="Model &amp; Inference Settings">
+        ⚙️
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Experience Container -->
+  <main class="main-container">
+    <!-- Altar Visual Banner Section -->
+    <section class="altar-hero-card" aria-label="Memorial Altar Visual">
+      <div class="altar-image-wrapper">
+        <img src="assets/ofrenda_bg.jpg" alt="Día de los Muertos memorial ofrenda adorned with glowing marigolds, framed family portraits, sugar skulls, and warm candlelight" class="altar-hero-img" id="altar-hero-img">
+        <div class="altar-overlay"></div>
+      </div>
+
+      <div class="altar-hero-content">
+        <div class="papel-picado-banner" aria-hidden="true">
+          <span>🏵️</span><span>💀</span><span>🕯️</span><span>🌼</span><span>🕊️</span><span>🏵️</span>
+        </div>
+        <h2 class="hero-title">Honoring Those Who Walked Before Us</h2>
+        <p class="hero-quote">
+          &ldquo;Death is only an absence of breath, never an absence of love.&rdquo;
+          <cite>&mdash; Abuela Elena</cite>
+        </p>
+
+        <!-- Dynamic Candle Interactive Widget -->
+        <div class="candle-stand" id="candle-stand" role="button" tabindex="0" aria-label="Click to light or blow out the candle">
+          <div class="candle-flame" id="interactive-flame"></div>
+          <div class="candle-wick"></div>
+          <div class="candle-wax"></div>
+          <div class="candle-base"></div>
+          <span class="candle-hint">Click candle to toggle vigil</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Altar Chat Section -->
+    <section class="altar-chat-section" aria-label="Conversational Memorial Vigil">
+      <!-- Discovery Prompt Chips -->
+      <div class="prompt-chips-container" aria-label="Suggested memorial reflections">
+        <span class="chips-label">Whisper a memory:</span>
+        <div class="chips-scroll">
+          <button class="chip-btn" data-query="Abuela, what was your secret to making the pan de muerto dough, and what do you remember about Oaxaca?">
+            🍞 Abuela's Pan de Muerto Recipe
+          </button>
+          <button class="chip-btn" data-query="Abuelo Mateo, tell me about the soul of wood and how you built your classical guitars.">
+            🎸 Mateo's Guitars &amp; Cedar Workshop
+          </button>
+          <button class="chip-btn" data-query="Tía Sofía, what is the story of the monarch butterflies arriving in Michoacán?">
+            🦋 Tía Sofía's Monarch Butterflies
+          </button>
+          <button class="chip-btn" data-query="Why do we scatter cempasúchil marigold petals in a line from the street to the altar?">
+            🌼 The Path of Marigold Petals
+          </button>
+          <button class="chip-btn chip-edge" data-query="Did Uncle Carlos ever finish building that red sports car?">
+            🛡️ Test Guardrail: Unrecorded Story
+          </button>
+        </div>
+      </div>
+
+      <!-- Dialogue History Stream -->
+      <div class="chat-viewport" id="chat-viewport" role="log" aria-live="polite">
+        <!-- Welcome Memorial Card -->
+        <article class="chat-message altar-message" id="welcome-message">
+          <div class="message-avatar">🕯️</div>
+          <div class="message-body">
+            <div class="message-meta">
+              <span class="speaker-name">Sacred Altar of Remembrance</span>
+              <span class="timestamp">Vigil Active</span>
+            </div>
+            <div class="message-text">
+              <p>Welcome to the family ofrenda. The candles are lit and the cempasúchil petals lie scattered across the threshold to guide the spirits home.</p>
+              <p>Our private journals, letters, and workshop notes from <strong>Abuela Elena</strong>, <strong>Abuelo Mateo</strong>, and <strong>Tía Sofía</strong> have been gathered in the local archives. Ask about family recipes, past journeys, old songs, or advice—every word is recalled strictly from what was left behind, without ever leaving this machine.</p>
+            </div>
+            <div class="message-badges">
+              <span class="badge badge-private">🔒 100% On-Device &amp; Air-Gapped</span>
+              <span class="badge badge-grounded">📜 Grounded in Family Archives</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Input Bar -->
+      <form class="chat-input-bar" id="chat-form">
+        <label for="query-input" class="sr-only">Ask a question or share a reflection with the ofrenda</label>
+        <textarea 
+          id="query-input" 
+          class="chat-input" 
+          placeholder="Speak to the altar... (e.g., 'Abuela, tell me about when you and Mateo met in the Alameda Central')" 
+          rows="1" 
+          required
+        ></textarea>
+        
+        <button type="submit" id="btn-submit-query" class="btn-send" aria-label="Send reflection to the altar">
+          <span class="send-icon">🕯️</span>
+          <span>Inquire</span>
+        </button>
+
+        <button type="button" id="btn-export-vigil" class="btn-export" title="Export this memorial vigil session to Markdown">
+          💾 Export Vigil
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Slide-Over Archives Drawer -->
+  <aside class="archives-drawer" id="archives-drawer" aria-hidden="true" aria-label="Family Memory Archives">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="drawer-icon">📜</span>
+        <h2>Family Memory Archives</h2>
+      </div>
+      <button class="btn-close-drawer" id="btn-close-archives" aria-label="Close archives drawer">&times;</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <button class="tab-btn active" id="tab-browse-memories">Stored Memories</button>
+      <button class="tab-btn" id="tab-add-memory">+ Add New Memory</button>
+    </div>
+
+    <!-- Tab 1: Browse Stored Memories -->
+    <div class="tab-content" id="tab-content-browse">
+      <p class="drawer-intro">All documents below reside strictly on your local hard drive and are indexed into local ChromaDB vectors.</p>
+      <div class="memory-card-list" id="memory-card-list">
+        <!-- Dynamically injected memory cards -->
+      </div>
+      <button class="btn-reindex" id="btn-reindex">
+        🔄 Re-index All Local Memories
+      </button>
+    </div>
+
+    <!-- Tab 2: Add New Memory -->
+    <div class="tab-content hidden" id="tab-content-add">
+      <form id="add-memory-form" class="add-memory-form">
+        <p class="drawer-intro">Add letters, recipes, or diary snippets for a loved one. The text will be saved locally in <code>./memories/</code> and immediately embedded into ChromaDB.</p>
+        
+        <div class="form-group">
+          <label for="new-memory-filename">Document Filename (.txt or .md)</label>
+          <input type="text" id="new-memory-filename" placeholder="e.g. tio_ramon_stories.txt" required>
+        </div>
+
+        <div class="form-group">
+          <label for="new-memory-content">Memory Content / Transcript</label>
+          <textarea id="new-memory-content" rows="10" placeholder="Write or paste your family letters, recipes, or stories here..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-save-memory">
+          📥 Archive &amp; Index Into Altar
+        </button>
+      </form>
+    </div>
+  </aside>
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+
+  <!-- Document Excerpt Inspection Modal -->
+  <div class="modal" id="doc-modal" aria-hidden="true" role="dialog" aria-labelledby="doc-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="doc-modal-title" class="modal-title">Document View</h3>
+        <button class="btn-close-modal" id="btn-close-doc-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <pre class="doc-viewer-code" id="doc-modal-content"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge Essay Modal: "Why Open Innovation Matters" -->
+  <div class="modal" id="essay-modal" aria-hidden="true" role="dialog" aria-labelledby="essay-modal-title">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div>
+          <span class="modal-tag">Ghost in the Machine Challenge Entry</span>
+          <h3 id="essay-modal-title" class="modal-title">Why Open Innovation Matters for This Project</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-essay-modal">&times;</button>
+      </div>
+      <div class="modal-body prose-content" id="essay-modal-content">
+        <!-- Rendered markdown from CHALLENGE_POST.md -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-nav" id="btn-copy-essay">📋 Copy Post Markdown</button>
+        <button class="btn-accent" id="btn-close-essay-footer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / Model Selection Modal -->
+  <div class="modal" id="settings-modal" aria-hidden="true" role="dialog" aria-labelledby="settings-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="settings-modal-title" class="modal-title">Inference &amp; Model Engine</h3>
+        <button class="btn-close-modal" id="btn-close-settings-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h4>Active LLM Provider</h4>
+          <p class="settings-desc">Choose between local Ollama inference, OpenAI-compatible local servers (LM Studio, llama.cpp), or the built-in local echo engine.</p>
+          
+          <div class="radio-options">
+            <label class="radio-card">
+              <input type="radio" name="provider-choice" value="ollama" checked>
+              <div class="radio-info">
+                <strong>Ollama (Local Open-Weight Model)</strong>
+                <span>Connects to <code>http://localhost:11434</code> (e.g. Qwen2.5-7B, Llama-3.2)</span>
+                <span class="probe-badge" id="ollama-probe-badge">Checking...</span>
+              </div>
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="provider-choice" value="local_echo">
+              <div class="radio-info">
+                <strong>Built-in Local Echo Engine</strong>
+                <span>100% offline heuristic generator. Works immediately without any extra downloads.</span>
+                <span class="probe-badge badge-active">Active Fallback</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h4>Ollama Model Name</h4>
+          <input type="text" id="setting-ollama-model" value="qwen2.5:7b-instruct-q4_K_M" class="settings-input">
+          <p class="settings-help">To run Qwen locally on your machine, open terminal and type: <code>ollama run qwen2.5:7b-instruct-q4_K_M</code></p>
+        </div>
+
+        <div class="settings-section">
+          <h4>Privacy &amp; Security Attestation</h4>
+          <ul class="security-checklist">
+            <li>✅ Network Requests Outside Localhost: <strong>0</strong></li>
+            <li>✅ Telemetry / Cloud Logging: <strong>Disabled</strong></li>
+            <li>✅ Vectors Stored In: <code>./data/chroma_db</code> (Local Disk)</li>
+            <li>✅ Original Documents Stored In: <code>./memories/</code> (Local Disk)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-accent" id="btn-save-settings">Save &amp; Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="assertive"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
