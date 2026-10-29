@@ -79,6 +79,7 @@ To power the altar with the full 7-billion-parameter open-weight model:
 ├── data/
 │   └── chroma_db/               # Persistent on-device ChromaDB vector database
 ├── CHALLENGE_POST.md            # The complete essay: "Why Open Innovation Matters"
+├── LICENSE                      # MIT Open-Source License
 ├── requirements.txt             # Clean list of Python dependencies
 ├── run.py                       # One-command quickstart launcher
 └── README.md                    # Project documentation
@@ -101,3 +102,8 @@ See the full submission essay in [CHALLENGE_POST.md](file:///d:/aaa/AI/New%20fol
 - Outgoing internet requests during execution: **0**
 - Third-party telemetry: **None**
 - In-process SQLite & disk storage: **100% Local**
+
+---
+
+## 📄 License
+This project is open-source software licensed under the [MIT License](LICENSE).
